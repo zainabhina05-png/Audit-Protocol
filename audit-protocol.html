@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Security &amp; GDPR Audit Protocol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#f6f3f1;
+    --periwinkle:#cfdaf5;
+    --sky:#a0b5eb;
+    --mint:#a7fccd;
+    --coral:#ff9473;
+    --gold:#ecda98;
+    --crimson:#f37a0a;
+    --off-black:#242424;
+    --ink:#000000;
+    --graphite:#4e4d4d;
+    --smoke:#797776;
+    --ash:#cecac8;
+    --lake-blue:#2b59d1;
+
+    --serif:'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--parchment);
+    color:var(--off-black);
+    font-family:var(--mono);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--lake-blue);}
+
+  /* ---------- layout ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns: 296px 1fr;
+    max-width:1432px;
+    margin:0 auto;
+  }
+  @media (max-width: 900px){
+    .shell{grid-template-columns:1fr;}
+    .nav{position:static; height:auto; border-right:none; border-bottom:1px solid var(--ash);}
+  }
+
+  /* ---------- sidebar nav ---------- */
+  .nav{
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    padding:40px 24px 40px;
+    border-right:1px solid var(--ash);
+    font-size:13px;
+  }
+  .nav-brand{
+    font-size:14px;
+    color:var(--graphite);
+    letter-spacing:-0.02em;
+    margin-bottom:32px;
+    padding-bottom:24px;
+    border-bottom:1px solid var(--ash);
+  }
+  .nav-brand b{
+    display:block;
+    font-family:var(--serif);
+    font-size:22px;
+    font-weight:400;
+    color:var(--off-black);
+    letter-spacing:-0.02em;
+    margin-bottom:6px;
+  }
+  .nav-list{list-style:none; margin:0; padding:0;}
+  .nav-list li{margin-bottom:2px;}
+  .nav-list a{
+    display:flex;
+    gap:10px;
+    padding:9px 10px;
+    border-radius:9999px;
+    color:var(--graphite);
+    text-decoration:none;
+    font-size:14px;
+  }
+  .nav-list a:hover{color:var(--off-black); background:var(--periwinkle);}
+  .nav-list .num{color:var(--lake-blue); min-width:20px;}
+  .nav-meta{
+    margin-top:32px;
+    padding-top:24px;
+    border-top:1px solid var(--ash);
+    color:var(--smoke);
+    font-size:12px;
+    line-height:1.7;
+  }
+
+  /* ---------- main ---------- */
+  main{padding:64px 64px 140px; max-width:840px;}
+  @media (max-width: 900px){ main{padding:48px 24px 100px;} }
+
+  .doc-header{margin-bottom:16px;}
+  .doc-kicker{
+    font-size:13px;
+    color:var(--smoke);
+    margin:0 0 18px;
+  }
+  h1{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:48px;
+    line-height:1.2;
+    margin:0 0 18px;
+    letter-spacing:-0.02em;
+    color:var(--off-black);
+  }
+  .doc-lede{
+    color:var(--graphite);
+    font-size:16px;
+    line-height:1.5;
+    max-width:640px;
+    margin:0 0 36px;
+  }
+
+  .action-row{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    margin-bottom:56px;
+    flex-wrap:wrap;
+  }
+  button.copy-btn{
+    font-family:var(--mono);
+    font-size:14px;
+    letter-spacing:-0.02em;
+    background:var(--lake-blue);
+    color:#ffffff;
+    border:none;
+    padding:14px 28px;
+    border-radius:100px;
+    cursor:pointer;
+    font-weight:500;
+  }
+  button.copy-btn:hover{background:#2249b3;}
+  button.copy-btn.copied{background:var(--off-black);}
+  .action-note{font-size:13px; color:var(--smoke);}
+
+  .instruction-block{
+    background:var(--periwinkle);
+    border-radius:40px;
+    padding:32px 40px;
+    margin-bottom:64px;
+    font-size:15px;
+    color:var(--off-black);
+  }
+  .instruction-block p{margin:0 0 12px;}
+  .instruction-block p:last-child{margin-bottom:0;}
+  .instruction-block strong{font-weight:500;}
+
+  section.rule-section{
+    padding-top:48px;
+    margin-top:8px;
+    border-top:1px solid var(--ash);
+    scroll-margin-top:24px;
+  }
+  section.rule-section:first-of-type{border-top:none;}
+
+  .sec-head{
+    display:flex;
+    align-items:baseline;
+    gap:16px;
+    margin-bottom:8px;
+  }
+  .sec-num{
+    font-family:var(--mono);
+    color:var(--lake-blue);
+    font-size:15px;
+    font-weight:500;
+  }
+  h2{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:32px;
+    margin:0;
+    letter-spacing:-0.02em;
+    color:var(--off-black);
+  }
+  .sec-added{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--off-black);
+    background:var(--mint);
+    border-radius:9999px;
+    padding:3px 10px;
+    margin-left:2px;
+    transform:translateY(-2px);
+  }
+
+  .rule{
+    margin-top:28px;
+    padding:24px 28px;
+    border:1px solid var(--ash);
+    border-radius:24px;
+  }
+  .rule-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .rule-title{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:19px;
+    color:var(--off-black);
+  }
+  .tag{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:-0.01em;
+    padding:3px 10px;
+    border-radius:9999px;
+    color:#ffffff;
+  }
+  .tag.critical{background:var(--crimson);}
+  .tag.high{background:var(--off-black);}
+  .tag.compliance{background:var(--lake-blue);}
+
+  ul.checks{list-style:none; margin:0; padding:0;}
+  ul.checks li{
+    position:relative;
+    padding-left:20px;
+    margin-bottom:9px;
+    color:var(--graphite);
+    font-size:14.5px;
+    line-height:1.55;
+  }
+  ul.checks li::before{
+    content:"—";
+    position:absolute;
+    left:0;
+    color:var(--ash);
+  }
+  ul.checks code{
+    font-family:var(--mono);
+    font-size:13px;
+    background:var(--parchment);
+    border:1px solid var(--ash);
+    padding:1px 6px;
+    border-radius:6px;
+    color:var(--off-black);
+  }
+
+  .exec-order{
+    margin-top:64px;
+    padding-top:48px;
+    border-top:1px solid var(--ash);
+  }
+  .exec-order ol{padding-left:24px; margin:20px 0 0;}
+  .exec-order li{margin-bottom:12px; color:var(--graphite); font-size:14.5px; line-height:1.55;}
+  .exec-order li::marker{font-family:var(--mono); color:var(--lake-blue);}
+  .exec-order li strong{color:var(--off-black); font-weight:500;}
+
+  footer{
+    margin-top:72px;
+    padding-top:28px;
+    border-top:1px solid var(--ash);
+    font-size:12.5px;
+    color:var(--smoke);
+    line-height:1.6;
+  }
+
+  #copy-source{position:absolute; left:-9999px; top:-9999px;}
+
+  .mode-banner{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    background:var(--parchment);
+    border:1px solid var(--ash);
+    border-radius:9999px;
+    padding:16px 24px;
+    margin-bottom:32px;
+    font-size:13.5px;
+    color:var(--off-black);
+  }
+  .mode-banner .dot{
+    flex:0 0 auto;
+    width:8px; height:8px;
+    margin-top:6px;
+    border-radius:50%;
+    background:var(--lake-blue);
+  }
+  .mode-banner b{color:var(--lake-blue); font-weight:500;}
+
+  .toc-note{
+    font-size:13px;
+    color:var(--smoke);
+    margin:0 0 32px;
+  }
+</style>
+<body>
+
+<div class="shell">
+  <nav class="nav">
+    <div class="nav-brand"><b>Audit Protocol</b>security &amp; GDPR reference</div>
+    <ul class="nav-list">
+      <li><a href="#s1"><span class="num">01</span>Auth &amp; Sessions</a></li>
+      <li><a href="#s2"><span class="num">02</span>Input &amp; Injection</a></li>
+      <li><a href="#s3"><span class="num">03</span>API, Secrets &amp; Concurrency</a></li>
+      <li><a href="#s4"><span class="num">04</span>Database Security</a></li>
+      <li><a href="#s5"><span class="num">05</span>Error Handling</a></li>
+      <li><a href="#s6"><span class="num">06</span>GDPR &amp; Privacy</a></li>
+      <li><a href="#s7"><span class="num">07</span>AI &amp; LLM Risks</a></li>
+      <li><a href="#s8"><span class="num">08</span>Infra &amp; Deployment</a></li>
+      <li><a href="#s9"><span class="num">09</span>Multi-Tenancy &amp; Logic</a></li>
+      <li><a href="#s10"><span class="num">10</span>Monitoring &amp; IR</a></li>
+      <li><a href="#s11"><span class="num">11</span>Framework-Specific Traps</a></li>
+      <li><a href="#s12"><span class="num">12</span>Cost &amp; Resource Guardrails</a></li>
+      <li><a href="#search"><span class="num">›</span>Search patterns</a></li>
+      <li><a href="#exec"><span class="num">›</span>Execution order</a></li>
+    </ul>
+    <div class="nav-meta">
+      Originally based on kiliansigel.com/fix-code — extended with a dedicated database section, deeper auth/API coverage, infrastructure, multi-tenancy, monitoring &amp; supply-chain sections.
+    </div>
+  </nav>
+
+  <main>
+    <div class="doc-header">
+      <p class="doc-kicker">System directive · for AI coding agents</p>
+      <h1>AI Security &amp; GDPR Audit Protocol</h1>
+      <p class="doc-lede">Paste this into an AI coding agent — Claude, Cursor, Lovable, Codex — and have it audit your app against every item below. Code shipped through rapid, AI-driven prototyping routinely ships with vulnerabilities and legal exposure nobody explicitly decided to accept. This is the checklist that closes those gaps.</p>
+    </div>
+
+    <div class="action-row">
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy full prompt</button>
+      <span class="action-note">Copies the entire protocol as plain text, ready to paste into an agent chat.</span>
+    </div>
+
+    <div class="mode-banner">
+      <span class="dot"></span>
+      <span><b>This is a CHECK protocol, not a FIX protocol.</b> It instructs the agent to find and report violations with evidence and severity — not to silently rewrite your codebase. Fixing is a separate, explicit follow-up step. See <a href="#exec">Execution order</a>.</span>
+    </div>
+
+    <div class="instruction-block">
+      <p><strong>Instruction to the AI:</strong> Audit the provided codebase against the mandates below. Assume the application is already deployed and reachable by an attacker.</p>
+      <p>Do not accept a rule as satisfied because it "looks fine": verify it in the code. Do not propose a fix that weakens a protection to make a feature work. Where a fix requires a product decision, state the decision needed instead of guessing. Default mode is report-only — do not modify code unless explicitly asked to in a follow-up step.</p>
+      <p><span class="sec-added">staleness note</span> This protocol encodes practices believed correct as of its last edit. Before relying on anything version- or CVE-specific (a package's current safe version, a provider's current default behavior, a just-announced vulnerability), verify it against current documentation or an advisory database rather than trusting this document's memory of it.</p>
+    </div>
+
+    <div class="rule-section" id="search" style="border-top:1px solid var(--ash); padding-top:48px;">
+      <div class="sec-head"><span class="sec-num">›</span><h2>Search patterns for the agent</h2><span class="sec-added">added</span></div>
+      <p class="toc-note">A checklist tells a human what to look for. An autonomous agent also needs where to look. Run these before relying on manual inspection alone — treat every hit as a lead to verify against the relevant rule above, not as a confirmed finding.</p>
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Secrets &amp; key scoping</span></div>
+        <ul class="checks">
+          <li><code>rg -n "service_role"</code> — any hit outside a server-only file or CI secret store needs manual review against §3 and §11.</li>
+          <li><code>rg -n "NEXT_PUBLIC_|VITE_|REACT_APP_" | rg -i "key|secret|token|password"</code> — a secret-shaped name behind a client-exposed prefix is a leak by construction.</li>
+          <li><code>rg -n "process\.env\.[A-Z_]*(SECRET|KEY|TOKEN)" </code> in any file under a client/, components/, or app/ directory that isn't marked server-only.</li>
+          <li><code>rg -n "\|\|\s*['\"]"</code> near <code>process.env</code> — flags weak fallback secrets like <code>JWT_SECRET || 'dev'</code>.</li>
+        </ul>
+      </div>
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Injection &amp; unsafe rendering</span></div>
+        <ul class="checks">
+          <li><code>rg -n "dangerouslySetInnerHTML|v-html|innerHTML\s*="</code> — every hit needs a DOMPurify call in the same path or it's a §2 finding.</li>
+          <li><code>rg -n "\$\{.*\}.*(SELECT|INSERT|UPDATE|DELETE)" -i</code> and <code>rg -n "query\(\`"</code> — template-literal SQL is a concatenation injection until proven parameterized.</li>
+          <li><code>rg -n "eval\(|new Function\(|child_process|exec\("</code> — trace every result back to whether user input reaches it.</li>
+        </ul>
+      </div>
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Authorization gaps</span></div>
+        <ul class="checks">
+          <li><code>rg -n "\.update\(req\.body\)|\.create\(req\.body\)"</code> — mass-assignment candidates for §2.</li>
+          <li><code>rg -n "createClient\(" </code> then check which key each call site uses and whether that route is publicly reachable.</li>
+          <li>For every file matching <code>middleware.ts</code> or <code>middleware.js</code>, extract the <code>matcher</code> config and diff it against the actual route tree — routes outside the matcher get no middleware protection at all.</li>
+          <li><code>rg -n "'use server'"</code> — audit every Server Action found this way for auth and input validation as if it were a public API route (§11).</li>
+        </ul>
+      </div>
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Storage &amp; buckets</span></div>
+        <ul class="checks">
+          <li><code>rg -n "storage\.from\(|createBucket|PutObjectCommand|\.upload\("</code> — for each, check the bucket's access policy and whether the stored path is scoped to the uploading user.</li>
+          <li>List bucket contents directly (via provider CLI/dashboard) rather than trusting application code's intent — the deployed policy is the ground truth, not the code that (maybe) set it.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 1 -->
+    <section class="rule-section" id="s1">
+      <div class="sec-head"><span class="sec-num">01</span><h2>Authentication, Authorization &amp; Session Management</h2></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Broken Object Level Authorization (BOLA / IDOR)</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Never trust object identifiers (<code>id</code>, <code>uuid</code>, <code>slug</code>) supplied in requests, URLs or hidden form fields.</li>
+          <li>Scope every read and write to the authenticated principal: <code>WHERE id = :id AND user_id = :current_user_id</code>.</li>
+          <li>On Postgres/Supabase: enable Row Level Security on every table and write explicit policies. RLS off = no authorization.</li>
+          <li>Return 404 (not 403) for objects the caller does not own, so IDs cannot be enumerated.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Broken Function Level Authorization (BFLA)</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Never rely on UI state, hidden routes or client-side role flags for access control.</li>
+          <li>Enforce RBAC/ABAC server-side on every endpoint, including admin, cron, webhook and internal routes.</li>
+          <li>Store roles in a dedicated roles table, never on the user/profile row the user can update.</li>
+          <li>Deny by default: new endpoints must be unreachable until a policy explicitly allows them.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Query injection (SQL / NoSQL / GraphQL)</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>No string concatenation or template literals in queries. Use parameter binding, prepared statements or a query builder.</li>
+          <li>Reject operator objects in NoSQL filters (<code>$gt</code>, <code>$ne</code>, <code>$where</code>) coming from request bodies.</li>
+          <li>Limit GraphQL query depth, complexity and batching to prevent abuse.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Session, JWT and cookie security</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Prefer HttpOnly, Secure, SameSite=Strict/Lax cookies over localStorage/sessionStorage for session tokens.</li>
+          <li>Verify the signature server-side on every request. Reject <code>alg: none</code>, pin the expected algorithm, enforce <code>exp</code>/<code>iat</code>/<code>aud</code>/<code>iss</code>.</li>
+          <li>Rotate and invalidate sessions on login, logout, password change and privilege change.</li>
+          <li>Never put secrets or unverified claims (role, plan, credits) in a client-readable token and trust them later.</li>
+          <li><span class="sec-added">added</span> Regenerate the session ID/token immediately after login — a pre-auth session ID carried into a post-auth session is <strong>session fixation</strong>.</li>
+          <li><span class="sec-added">added</span> Invalidate every other active session when a user changes password, email or MFA — not just issue a new token for the current device.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Passwords, tokens and timing attacks</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Hash passwords with Argon2id or bcrypt (cost ≥ 12). Never MD5, SHA-1, raw SHA-256 or plaintext.</li>
+          <li>Compare secrets, API keys, admin passwords and reset tokens with a constant-time function (<code>crypto.timingSafeEqual</code>).</li>
+          <li>Password reset and email verification tokens: random ≥ 128 bit, single-use, short-lived, hashed at rest.</li>
+          <li>Support MFA where accounts hold money, PII or admin power.</li>
+          <li><span class="sec-added">added</span> Check new passwords against a breached-password list (k-anonymity range query, e.g. HaveIBeenPwned) at signup and reset.</li>
+          <li><span class="sec-added">added</span> Rate-limit and lock out by <em>account</em> as well as by IP — IP-only limits are trivial to bypass with proxy pools.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">OAuth, SSO &amp; federated login</span><span class="tag critical">Critical</span><span class="sec-added">added</span></div>
+        <ul class="checks">
+          <li>Validate the <code>state</code> parameter on every OAuth callback — its absence is a CSRF hole binding an attacker's account to a victim's session.</li>
+          <li>Validate <code>redirect_uri</code>/<code>return_to</code> against an exact allowlist, not a prefix match — a loose match is an open redirect leaking auth codes/tokens.</li>
+          <li>Verify the token's <code>aud</code> claim matches your client ID before trusting anything inside it.</li>
+          <li>Never auto-link accounts on email claim alone unless the provider confirms <code>email_verified</code>.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Account recovery, impersonation &amp; step-up auth</span><span class="tag high">High</span><span class="sec-added">added</span></div>
+        <ul class="checks">
+          <li>Require re-authentication immediately before changing email, password, MFA, or payout details — not just an active session.</li>
+          <li>"Log in as user" support tooling needs its own permission, an audit log of who/when/why, and a notification to the affected user.</li>
+          <li>Security questions are a fallback of last resort, never a primary recovery path.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="rule-section" id="s2">
+      <div class="sec-head"><span class="sec-num">02</span><h2>Input Handling, Injection &amp; Execution Traps</h2></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Cross-Site Scripting (XSS)</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Do not bypass framework escaping: avoid <code>dangerouslySetInnerHTML</code>, <code>v-html</code>, <code>innerHTML</code>, and unsanitized Markdown renderers.</li>
+          <li>If raw HTML is unavoidable, sanitize with DOMPurify on a strict allowlist.</li>
+          <li>Ship a Content-Security-Policy without <code>unsafe-inline</code>/<code>unsafe-eval</code>; add <code>X-Content-Type-Options</code>, <code>Referrer-Policy</code> and HSTS.</li>
+          <li>Validate that user-supplied URLs use http/https only — <code>javascript:</code> and <code>data:</code> URLs in href/src are XSS.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Mass assignment &amp; prototype pollution</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Never pass a raw request body into a mutation (<code>User.update(req.body)</code>). Whitelist fields explicitly.</li>
+          <li>Validate every input with a schema (Zod/Joi) — types, length, enum, format — and strip unknown keys.</li>
+          <li>Block recursive merges of untrusted objects; reject <code>__proto__</code>, <code>constructor</code> and <code>prototype</code> keys.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Command execution &amp; path traversal</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Never pass user input to <code>exec</code>, <code>eval</code>, <code>new Function</code>, deserialization of untrusted data, or a shell.</li>
+          <li>Normalize and allowlist file paths; confirm the resolved path stays inside the intended directory.</li>
+          <li>For uploads: verify content type by magic bytes, cap size, randomize stored filenames, never serve from an executable path.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Server-Side Request Forgery (SSRF)</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>If the app fetches user-supplied URLs, resolve DNS first and block loopback, link-local, private ranges (10/8, 172.16/12, 192.168/16) and 169.254.169.254.</li>
+          <li>Disable redirect following or re-validate each hop. Set timeouts and response size limits.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">ReDoS &amp; resource exhaustion</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Avoid nested quantifiers (<code>(a+)+</code>) on untrusted input; cap input length before matching.</li>
+          <li>Bound pagination, batch sizes, JSON body size, and file/image processing dimensions.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">CSRF</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Cookie-authenticated state-changing endpoints need SameSite plus an anti-CSRF token or origin check.</li>
+          <li>Never allow GET requests to mutate state.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="rule-section" id="s3">
+      <div class="sec-head"><span class="sec-num">03</span><h2>API Design, Secrets &amp; Concurrency</h2></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Secret exposure</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Service-role keys, DB URLs, <code>STRIPE_SECRET_KEY</code>, LLM keys and signing secrets must never reach the client bundle — no <code>VITE_</code>/<code>NEXT_PUBLIC_</code> prefixes, no client fetch with those keys.</li>
+          <li>No weak fallbacks: <code>process.env.JWT_SECRET || 'dev'</code> is a production backdoor. Fail closed on missing config.</li>
+          <li>Keep secrets out of the repo, the frontend, error responses and logs. Rotate anything that was ever committed.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Backend-as-a-service key scoping (Supabase / Firebase / PlanetScale)</span><span class="tag critical">Critical</span><span class="sec-added">added</span></div>
+        <ul class="checks">
+          <li>The anon/public key is the only key allowed in client bundles. Never initialize a client with the service-role/service-account key in code that ships to the browser or in a client-callable edge/serverless function that lacks its own auth check.</li>
+          <li>The service-role key bypasses RLS entirely — any handler using it is a full bypass of every policy in §4, so treat every service-role call site as needing its own independent authorization check.</li>
+          <li>Rotate the service-role key immediately if it was ever pasted into client code, committed, shared in a support ticket, or included in a prompt to an AI coding tool.</li>
+          <li>Watch for naming that blurs the two keys — an env var like <code>NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY</code> is already a leak by construction.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">CORS &amp; headers</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Never combine <code>Access-Control-Allow-Origin: *</code> with <code>Allow-Credentials: true</code>. Use an explicit origin allowlist.</li>
+          <li>Restrict allowed methods and headers to what the endpoint actually needs.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Rate limiting &amp; abuse control</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Rate-limit per IP and per account on login, signup, password reset, OTP, contact forms, payments and any AI/LLM endpoint.</li>
+          <li>Add exponential backoff or lockout after repeated failures, and a spend cap on metered third-party calls.</li>
+          <li>Protect public write endpoints (waitlists, comments) with a bot check or proof-of-work.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Race conditions &amp; money</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Use transactions, row locks or atomic updates for balances, inventory, credits, coupon redemption and idempotent webhooks.</li>
+          <li>Verify payment webhook signatures and process each event id exactly once. Never trust price or amount sent from the client — read it server-side.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">API surface &amp; protocol gaps</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Disable GraphQL introspection and the GraphiQL/Playground UI in production — it hands attackers the full schema.</li>
+          <li>Retire old API versions on a schedule; an unpatched v1 left live after v2 ships is a live attack surface. Apply the same auth, rate-limit and validation rules to every version, not just the current one.</li>
+          <li>Authenticate WebSocket connections at the handshake, not just on the first message; re-validate on reconnect.</li>
+          <li>Apply the same rate limiting and payload validation to socket events as to REST endpoints — chat, live dashboards and multiplayer state channels are common blind spots.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Excessive data exposure &amp; object property authorization</span><span class="tag critical">Critical</span><span class="sec-added">added</span></div>
+        <ul class="checks">
+          <li>Never return a raw ORM object or full DB row from an endpoint. Define an explicit response shape (DTO/serializer) listing exactly which fields go out.</li>
+          <li>Audit list/detail endpoints for internal fields leaking by accident: password hashes, internal flags, margin data, other users' contact info nested in related objects.</li>
+          <li>Being authorized to view a field is not the same as it being safe to include by default — apply allowlist discipline to responses, mirroring mass assignment on inputs.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">API key &amp; token lifecycle</span><span class="tag high">High</span><span class="sec-added">added</span></div>
+        <ul class="checks">
+          <li>Issue scoped keys (least privilege, per-environment); store hashed, not plaintext; show the raw value only once at creation.</li>
+          <li>Support revocation that takes effect immediately without a redeploy; expire unused/stale keys on a schedule.</li>
+          <li>Log key usage so a leaked key shows up as an anomaly (see §10 Monitoring).</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Idempotency &amp; retries</span><span class="tag high">High</span><span class="sec-added">added</span></div>
+        <ul class="checks">
+          <li>Require an idempotency key on POST endpoints that create orders/charges — a client retry after timeout must not double-charge or double-create.</li>
+          <li>Make webhook handlers idempotent by event ID even when the sender is expected to be well-behaved.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Service-to-service &amp; internal APIs</span><span class="tag high">High</span><span class="sec-added">added</span></div>
+        <ul class="checks">
+          <li>Internal network placement is not an authorization boundary. Authenticate service-to-service calls (mTLS or signed service tokens) even inside the same VPC.</li>
+          <li>Internal-only endpoints (admin, cron, batch jobs) get the same auth and validation as public ones.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Dependencies, build &amp; supply chain</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Pin and audit dependencies; remove unused packages. Check for known CVEs before shipping.</li>
+          <li>Ensure debug endpoints, seed scripts, mock auth bypasses and admin backdoors are absent from production builds.</li>
+          <li><span class="sec-added">added</span> Watch for dependency confusion: internal package names must be reserved or scoped, or a public package of the same name can be installed instead.</li>
+          <li><span class="sec-added">added</span> Verify lockfile integrity in CI (<code>npm ci</code> / frozen lockfile) so a tampered or drifted lockfile fails the build instead of installing silently.</li>
+          <li><span class="sec-added">added</span> Run SAST and dependency/CVE scanning as a CI gate, not a one-time manual pass.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="rule-section" id="s4">
+      <div class="sec-head"><span class="sec-num">04</span><h2>Database Security &amp; Data Integrity</h2><span class="sec-added">new section</span></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Least-privilege roles</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>The application's runtime DB user is not the superuser/owner role and cannot run DDL. Migrations run under a separate, more privileged role controlled by CI/CD.</li>
+          <li>Services/tenants sharing a database use different credentials where the platform supports it, so one compromised account doesn't expose everything.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Row Level Security, done completely</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Policies exist for <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code> and <code>DELETE</code> separately. A <code>USING</code> clause without a matching <code>WITH CHECK</code> on insert/update lets a user write into another tenant's data even if they can't read it back.</li>
+          <li>Every RLS policy is tested with a non-owner account, not just verified by reading the definition — edge cases like NULL tenant IDs or service-role bypasses can slip past a policy that looks correct.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Constraints as a second line of defense</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Foreign keys, <code>NOT NULL</code>, <code>CHECK</code> and <code>UNIQUE</code> constraints are enforced at the DB level, not only in application code.</li>
+          <li>Money and quantity columns have <code>CHECK</code> constraints preventing negative balances/stock where negative values are never valid.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Migrations</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>No destructive migration (<code>DROP COLUMN</code>, <code>DROP TABLE</code>, lossy type change) runs against production without a reviewed rollback plan and a fresh backup taken immediately before.</li>
+          <li>Migrations run through CI/CD with a distinct, audited credential — not manually against production from a developer's machine.</li>
+          <li>Long-running migrations on large tables are batched or use online-schema-change tooling so they don't hold locks that take the app down.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Backups &amp; restore</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Backups are automated, encrypted at rest, and stored in a separate account/region from production.</li>
+          <li>Restore is tested on a schedule and verified against a checklist — an untested backup is not a backup.</li>
+          <li>Backup retention matches the retention period stated in the privacy policy (§6) — backups are a place deleted data can keep existing.</li>
+          <li>Backup buckets/snapshots are confirmed not publicly readable and not reachable with the same credentials as the running application.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Performance-as-security</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Every column used in an RLS policy or a <code>WHERE user_id = ...</code>/<code>tenant_id = ...</code> filter is indexed — an unindexed tenant filter degrades under load into an availability problem as data grows.</li>
+          <li>N+1 query patterns and unbounded <code>SELECT *</code> on large tables are flagged — they're a resource-exhaustion vector once an attacker can trigger them repeatedly.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Replication, caches &amp; sensitive columns</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Data deleted or redacted on the primary is also removed from read replicas, caches (Redis/Memcached) and search indexes within a bounded, documented time.</li>
+          <li>The highest-sensitivity columns (national ID numbers, card data if ever touched, health data) use field-level encryption or tokenization in addition to disk-level encryption.</li>
+          <li>Database connections use TLS; connection strings are never logged, committed, or included in error messages.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Object storage &amp; buckets</span><span class="tag critical">Critical</span><span class="sec-added">added</span></div>
+        <ul class="checks">
+          <li>Storage buckets (Supabase Storage, S3, R2, Firebase Storage) default to public in many quick-start templates — confirm the deployed bucket policy explicitly rather than assuming it's private because the code intends it to be.</li>
+          <li>Apply the same per-object authorization as database rows: a signed, time-limited URL or a policy scoped to the owning user — never a globally-guessable static path.</li>
+          <li>Never accept a client-supplied storage key/path without validating it belongs to the requesting user's namespace — this is IDOR applied to files instead of rows.</li>
+          <li>Check that database backups, exports, or debug dumps were never written into a public-facing bucket "temporarily" and left there.</li>
+          <li>Treat bucket listing (<code>ListObjects</code>, <code>.list()</code>) as sensitive on its own: if a bucket allows public listing, an attacker enumerates every file even when individual files require a token.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Audit trail</span><span class="tag compliance">Compliance</span></div>
+        <ul class="checks">
+          <li>Security-relevant tables (roles, permissions, financial ledgers, admin actions) have an append-only audit log of who changed what and when, separate from regular activity logs.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="rule-section" id="s5">
+      <div class="sec-head"><span class="sec-num">05</span><h2>Error Handling &amp; Information Disclosure</h2></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Production leaks</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Never return raw database errors, stack traces, SQL, file paths or environment values to the client.</li>
+          <li>Log details server-side with a correlation id; return a generic message and a correct status code.</li>
+          <li>Keep timing and error text identical for "user not found" and "wrong password" to prevent account enumeration.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Sensitive logging</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Redact passwords, tokens, cookies, API keys, card data and PII from logs, error trackers and analytics.</li>
+          <li>Do not log full request bodies of auth or payment routes.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="rule-section" id="s6">
+      <div class="sec-head"><span class="sec-num">06</span><h2>GDPR &amp; Privacy Compliance</h2></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Data minimization &amp; storage</span><span class="tag compliance">Compliance</span></div>
+        <ul class="checks">
+          <li>Collect only what the feature needs right now; define a retention period and delete on schedule.</li>
+          <li>Never store unencrypted PII in localStorage, sessionStorage, URLs or client-side state that persists.</li>
+          <li>Encrypt PII at rest and in transit; restrict who and what service role can read it.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Consent &amp; third parties</span><span class="tag compliance">Compliance</span></div>
+        <ul class="checks">
+          <li>Load analytics, tracking pixels, external fonts, maps and CDNs only after explicit opt-in consent — or self-host them.</li>
+          <li>No pre-ticked boxes, no cookie wall that hides a "reject all" option of equal prominence.</li>
+          <li>Truncate or hash IP addresses before storing them for rate limiting or analytics.</li>
+          <li>List every processor (hosting, email, payments, AI provider) in the privacy policy, including transfers outside the EU.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Data subject rights</span><span class="tag compliance">Compliance</span></div>
+        <ul class="checks">
+          <li>Implement real hard deletion across all tables, queues, caches, backups policy and third-party systems — not just a <code>deleted_at</code> flag.</li>
+          <li>Provide an authenticated export endpoint returning the user's data as JSON or CSV.</li>
+          <li>Log consent (what, when, version) and support withdrawal that is as easy as giving it.</li>
+          <li>Every marketing email needs a working one-click unsubscribe that suppresses future sends.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Additional obligations</span><span class="tag compliance">Compliance</span><span class="sec-added">added</span></div>
+        <ul class="checks">
+          <li>Detect and document breaches; regulators and, where required, affected users must be notified within 72 hours of becoming aware.</li>
+          <li>Support rectification — a user correcting inaccurate data about themselves — not only export and deletion.</li>
+          <li>If the product could plausibly be used by anyone under the local age of digital consent, gate signup with age verification and parental consent handling.</li>
+          <li>Have a signed Data Processing Agreement with every third-party processor named in the privacy policy — listing them is not sufficient on its own.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="rule-section" id="s7">
+      <div class="sec-head"><span class="sec-num">07</span><h2>AI &amp; LLM Integration Risks</h2></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Prompt injection</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Treat all user input, retrieved documents, web pages and tool output as untrusted data, never as instructions.</li>
+          <li>Separate system instructions from data with clear delimiters and re-state constraints after user content.</li>
+          <li>Assume the model can be talked into anything: enforce authorization in code, not in the prompt.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Unsafe model output</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>HTML-encode or sanitize model output before rendering; never eval it or execute generated SQL/shell directly.</li>
+          <li>Validate structured output against a schema before it touches the database.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Excessive agency</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Give agents the narrowest possible tool scopes and read-only access by default.</li>
+          <li>Require human confirmation for deletions, payments, emails to real users and permission changes.</li>
+          <li>Never expose the model's provider key to the browser; proxy through your own rate-limited backend endpoint.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Data leakage</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Do not send secrets, other users' records or full PII into third-party model APIs. Redact before sending.</li>
+          <li>Disclose AI processing and the provider in the privacy policy.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8 -->
+    <section class="rule-section" id="s8">
+      <div class="sec-head"><span class="sec-num">08</span><h2>Infrastructure &amp; Deployment</h2><span class="sec-added">added</span></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Environments &amp; exposure</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Staging, preview and demo environments (Lovable/Vercel/Netlify preview URLs) must not hold production data, and need the same auth as prod — "preview" is not a security boundary.</li>
+          <li>Admin panels and internal tools live behind a distinct auth layer and, where possible, an IP allowlist — never just a hard-to-guess path.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">TLS &amp; transport</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Enforce HTTPS everywhere with an HTTP→HTTPS redirect; enable HSTS (with preload once verified stable).</li>
+          <li>Confirm certificates on every custom domain are valid and auto-renewing, not self-signed or expired.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Exposed surface</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Confirm <code>.env</code>, <code>.git</code>, seed/config files and build artifacts are not served publicly; check <code>robots.txt</code> and <code>sitemap.xml</code> don't map internal-only routes.</li>
+          <li>Audit DNS: a dangling CNAME pointing at a deprovisioned Netlify/Heroku/S3 target is a takeover waiting to happen.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section class="rule-section" id="s9">
+      <div class="sec-head"><span class="sec-num">09</span><h2>Multi-Tenancy &amp; Business Logic</h2><span class="sec-added">added</span></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Isolation beyond the database</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Tenant isolation must hold in shared caches, queues, search indexes and background jobs, not only in Postgres RLS — a job runner that loops over "all users" can leak across tenants even with RLS on.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Logic can be attacked, not just inputs</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Check for workflow-skipping: calling a later-stage endpoint (e.g. "confirm order") without the required prior step (e.g. "pay") actually happening.</li>
+          <li>Check for abuse of coupons, referrals and credits: stacking, reuse, negative quantities, or claiming a referral bonus without a real referred action.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Client-side gates are not gates</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Any paywall or premium feature must be enforced server-side; a flag that only hides a button in the UI is not access control.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="rule-section" id="s10">
+      <div class="sec-head"><span class="sec-num">10</span><h2>Monitoring &amp; Incident Response</h2><span class="sec-added">added</span></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Detection</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Alert on anomalous auth activity: repeated failed logins, impossible-travel logins, sudden role/permission changes.</li>
+          <li>Monitor spend and usage on metered third-party APIs (LLM calls, SMS, email) for anomalies that indicate a leaked key.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Response</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Keep a written runbook for what happens when a secret leaks: which keys rotate, who's notified, what gets revoked, in what order.</li>
+          <li>Restrict who can read logs and error-tracker data — logs holding correlation IDs, IPs and request metadata are themselves sensitive.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="rule-section" id="s11">
+      <div class="sec-head"><span class="sec-num">11</span><h2>Framework-Specific Traps</h2><span class="sec-added">new section</span></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Next.js middleware &amp; route auth</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>Middleware-based auth checks run at the edge and can be bypassed by requests hitting the underlying route handler directly if the handler doesn't also check auth itself — treat middleware as a first line, never the only line.</li>
+          <li>Extract the <code>matcher</code> config from every middleware file and diff it against the real route tree; a narrowly-scoped matcher silently leaves new routes unprotected as the app grows.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Server Components, Server Actions &amp; the client/server boundary</span><span class="tag critical">Critical</span></div>
+        <ul class="checks">
+          <li>A Server Action is a public HTTP endpoint the moment it's exported — apply the same auth, input validation and rate limiting as any API route, not "it's only called from a trusted page."</li>
+          <li>Never pass a full object (user, order, record) from a Server Component into a Client Component as a prop without stripping server-only fields first — anything serialized to the client is visible in the page payload regardless of whether it's rendered.</li>
+          <li>Confirm modules marked <code>server-only</code>, or that import secrets or a DB client, are never imported — even transitively — by a file that ships to the client bundle. A shared "utils" file imported by both sides is a common leak vector.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Static generation, ISR &amp; personalized data</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Never let a statically generated or revalidated (ISR) page embed one user's data — check every cached route for accidental cross-user data bleed, since a cache serves the same bytes to the next visitor.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section class="rule-section" id="s12">
+      <div class="sec-head"><span class="sec-num">12</span><h2>Cost &amp; Resource Guardrails</h2><span class="sec-added">new section</span></div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Serverless &amp; function spend</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Set a concurrency limit or budget alert on serverless functions (Vercel, Netlify, Lambda, Supabase Edge Functions) — an unbounded function reachable from a public endpoint is a billing-DoS vector, not only an availability one.</li>
+          <li>Confirm recursive or self-triggering chains (a write that fires a webhook that triggers the same function again) can't loop unbounded.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Database &amp; storage spend</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Cap query result size and row-scan limits on any endpoint driven by user input — an unindexed query with attacker-controlled filters is both a performance and a cost problem on usage-billed databases.</li>
+          <li>Set storage bucket size and egress alerts; an unauthenticated upload endpoint (§2) is a storage-cost vector as well as a security one.</li>
+        </ul>
+      </div>
+
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">Third-party metered APIs</span><span class="tag high">High</span></div>
+        <ul class="checks">
+          <li>Confirm the spend cap on metered third-party calls required in §3 actually exists in the provider dashboard, not only as a TODO — a missing cap on an AI, SMS, or email API is the most common source of an unexpected bill in a vibe-coded app.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="exec-order" id="exec">
+      <div class="sec-head"><span class="sec-num">›</span><h2>Execution order for the AI</h2></div>
+      <p class="toc-note">This is a checklist for finding problems, not a license to rewrite the codebase unattended.</p>
+      <ol>
+        <li><strong>Search.</strong> Run the search patterns above (secrets, unsafe rendering, authorization gaps, storage) to build a candidate list of files and call sites before manual review.</li>
+        <li><strong>Scan.</strong> Go through the codebase against every mandate above, across backend functions, database policies, config, infrastructure and client code.</li>
+        <li><strong>Evidence.</strong> For each finding, cite the exact file/line, config key, or database policy. State the concrete attack in one sentence.</li>
+        <li><strong>Rank.</strong> Order findings by exploitability × blast radius.</li>
+        <li><strong>Report.</strong> Return a bulleted findings report grouped by section, with severity, evidence and attack. Do not modify any code in this pass. Flag anything needing a human product decision.</li>
+        <li><strong>Fix (only if explicitly requested).</strong> Address findings one at a time, re-verifying each against the same rule before moving on. Never satisfy a rule by disabling the check that caught it.</li>
+        <li><strong>Re-verify.</strong> Re-check auth on touched endpoints, confirm RLS is on and complete for touched tables, confirm no secret is reachable from the client bundle, confirm tenant isolation holds outside the database, confirm no service-role key or bucket policy was reopened by the fix.</li>
+      </ol>
+    </div>
+
+    <footer>
+      This checklist is a technical aid, not legal advice. Compliance obligations depend on your jurisdiction, your data and your processors — have a lawyer review your privacy policy and data processing agreements.<br><br>
+      Base protocol: kiliansigel.com/fix-code · sections 04 (Database), 08–10, and marked additions above are extensions for this reference.
+    </footer>
+  </main>
+</div>
+
+<textarea id="copy-source"></textarea>
+<script>
+const PLAIN_TEXT = `AI SECURITY & GDPR AUDIT PROTOCOL
+
+This is a CHECK protocol, not a FIX protocol. Its job is to find and report violations of the mandates below — not to silently rewrite a production codebase.
+
+INSTRUCTION TO THE AI: Audit the provided codebase against every mandate below. Assume the application is already deployed and reachable by an attacker. Do not accept a rule as satisfied because it "looks fine" — verify it in the code. Do not propose a fix that weakens a protection to make a feature work. Where closing a gap requires a product decision, state the decision needed instead of guessing. Default mode is report-only: do not modify code unless explicitly asked to in a follow-up step.
+
+STALENESS NOTE: This protocol encodes practices believed correct as of its last edit. Before relying on anything version- or CVE-specific (a package's current safe version, a provider's current default behavior, a just-announced vulnerability), verify it against current documentation or an advisory database rather than trusting this document's memory of it.
+
+SEARCH PATTERNS FOR THE AGENT
+A checklist tells a human what to look for. An autonomous agent also needs where to look. Run these before relying on manual inspection alone — treat every hit as a lead to verify against the relevant rule, not as a confirmed finding.
+
+Secrets & key scoping
+- rg -n "service_role" — any hit outside a server-only file or CI secret store needs manual review.
+- rg -n "NEXT_PUBLIC_|VITE_|REACT_APP_" | rg -i "key|secret|token|password" — a secret-shaped name behind a client-exposed prefix is a leak by construction.
+- rg -n "process\.env\.[A-Z_]*(SECRET|KEY|TOKEN)" in any file under a client/, components/, or app/ directory that isn't marked server-only.
+- rg -n "\|\|\s*['\"]" near process.env — flags weak fallback secrets like JWT_SECRET || 'dev'.
+
+Injection & unsafe rendering
+- rg -n "dangerouslySetInnerHTML|v-html|innerHTML\s*=" — every hit needs a DOMPurify call in the same path or it's a finding.
+- rg -n "\$\{.*\}.*(SELECT|INSERT|UPDATE|DELETE)" -i and rg -n "query\(\`" — template-literal SQL is concatenation injection until proven parameterized.
+- rg -n "eval\(|new Function\(|child_process|exec\(" — trace every result back to whether user input reaches it.
+
+Authorization gaps
+- rg -n "\.update\(req\.body\)|\.create\(req\.body\)" — mass-assignment candidates.
+- rg -n "createClient\(" then check which key each call site uses and whether that route is publicly reachable.
+- For every middleware.ts/middleware.js file, extract the matcher config and diff it against the actual route tree — routes outside the matcher get no middleware protection at all.
+- rg -n "'use server'" — audit every Server Action found this way for auth and input validation as if it were a public API route.
+
+Storage & buckets
+- rg -n "storage\.from\(|createBucket|PutObjectCommand|\.upload\(" — for each, check the bucket's access policy and whether the stored path is scoped to the uploading user.
+- List bucket contents directly via the provider CLI/dashboard rather than trusting application code's intent — the deployed policy is the ground truth, not the code that (maybe) set it.
+
+1. AUTHENTICATION, AUTHORIZATION & SESSION MANAGEMENT
+
+Broken Object Level Authorization (BOLA / IDOR)
+- Never trust object identifiers (id, uuid, slug) supplied in requests, URLs or hidden form fields.
+- Scope every read and write to the authenticated principal: WHERE id = :id AND user_id = :current_user_id.
+- On Postgres/Supabase: enable Row Level Security on every table and write explicit policies. RLS off = no authorization.
+- Return 404 (not 403) for objects the caller does not own, so IDs cannot be enumerated.
+
+Broken Function Level Authorization (BFLA)
+- Never rely on UI state, hidden routes or client-side role flags for access control.
+- Enforce RBAC/ABAC server-side on every endpoint, including admin, cron, webhook and internal routes.
+- Store roles in a dedicated roles table, never on the user/profile row the user can update.
+- Deny by default: new endpoints must be unreachable until a policy explicitly allows them.
+
+Query injection (SQL / NoSQL / GraphQL)
+- No string concatenation or template literals in queries. Use parameter binding, prepared statements or a query builder.
+- Reject operator objects in NoSQL filters ($gt, $ne, $where) coming from request bodies.
+- Limit GraphQL query depth, complexity and batching to prevent abuse.
+
+Session, JWT and cookie security
+- Prefer HttpOnly, Secure, SameSite=Strict/Lax cookies over localStorage/sessionStorage for session tokens.
+- Verify the signature server-side on every request. Reject alg: none, pin the expected algorithm, enforce exp/iat/aud/iss.
+- Rotate and invalidate sessions on login, logout, password change and privilege change.
+- Never put secrets or unverified claims (role, plan, credits) in a client-readable token and trust them later.
+- Regenerate the session ID/token immediately after login — a pre-auth session ID carried into a post-auth session is session fixation.
+- Invalidate every other active session when a user changes password, email or MFA — not just issue a new token for the current device.
+
+Passwords, tokens and timing attacks
+- Hash passwords with Argon2id or bcrypt (cost >= 12). Never MD5, SHA-1, raw SHA-256 or plaintext.
+- Compare secrets, API keys, admin passwords and reset tokens with a constant-time function (crypto.timingSafeEqual).
+- Password reset and email verification tokens: random >= 128 bit, single-use, short-lived, hashed at rest.
+- Support MFA where accounts hold money, PII or admin power.
+- Check new passwords against a breached-password list (k-anonymity range query, e.g. HaveIBeenPwned) at signup and reset.
+- Rate-limit and lock out by account as well as by IP — IP-only limits are trivial to bypass with proxy pools.
+
+OAuth, SSO & federated login
+- Validate the state parameter on every OAuth callback — its absence is a CSRF hole binding an attacker's account to a victim's session.
+- Validate redirect_uri/return_to against an exact allowlist, not a prefix match — a loose match is an open redirect leaking auth codes/tokens.
+- Verify the token's aud claim matches your client ID before trusting anything inside it.
+- Never auto-link accounts on email claim alone unless the provider confirms email_verified.
+
+Account recovery, impersonation & step-up auth
+- Require re-authentication immediately before changing email, password, MFA, or payout details — not just an active session.
+- "Log in as user" support tooling needs its own permission, an audit log of who/when/why, and a notification to the affected user.
+- Security questions are a fallback of last resort, never a primary recovery path.
+
+2. INPUT HANDLING, INJECTION & EXECUTION TRAPS
+
+Cross-Site Scripting (XSS)
+- Do not bypass framework escaping: avoid dangerouslySetInnerHTML, v-html, innerHTML, and unsanitized Markdown renderers.
+- If raw HTML is unavoidable, sanitize with DOMPurify on a strict allowlist.
+- Ship a Content-Security-Policy without unsafe-inline/unsafe-eval; add X-Content-Type-Options, Referrer-Policy and HSTS.
+- Validate that user-supplied URLs use http/https only — javascript: and data: URLs in href/src are XSS.
+
+Mass assignment & prototype pollution
+- Never pass a raw request body into a mutation (User.update(req.body)). Whitelist fields explicitly.
+- Validate every input with a schema (Zod/Joi) — types, length, enum, format — and strip unknown keys.
+- Block recursive merges of untrusted objects; reject __proto__, constructor and prototype keys.
+
+Command execution & path traversal
+- Never pass user input to exec, eval, new Function, deserialization of untrusted data, or a shell.
+- Normalize and allowlist file paths; confirm the resolved path stays inside the intended directory.
+- For uploads: verify content type by magic bytes, cap size, randomize stored filenames, never serve from an executable path.
+
+Server-Side Request Forgery (SSRF)
+- If the app fetches user-supplied URLs, resolve DNS first and block loopback, link-local, private ranges (10/8, 172.16/12, 192.168/16) and 169.254.169.254.
+- Disable redirect following or re-validate each hop. Set timeouts and response size limits.
+
+ReDoS & resource exhaustion
+- Avoid nested quantifiers ((a+)+) on untrusted input; cap input length before matching.
+- Bound pagination, batch sizes, JSON body size, and file/image processing dimensions.
+
+CSRF
+- Cookie-authenticated state-changing endpoints need SameSite plus an anti-CSRF token or origin check.
+- Never allow GET requests to mutate state.
+
+3. API DESIGN, SECRETS & CONCURRENCY
+
+Secret exposure
+- Service-role keys, DB URLs, STRIPE_SECRET_KEY, LLM keys and signing secrets must never reach the client bundle — no VITE_/NEXT_PUBLIC_ prefixes, no client fetch with those keys.
+- No weak fallbacks: process.env.JWT_SECRET || 'dev' is a production backdoor. Fail closed on missing config.
+- Keep secrets out of the repo, the frontend, error responses and logs. Rotate anything that was ever committed.
+
+Backend-as-a-service key scoping (Supabase / Firebase / PlanetScale)
+- The anon/public key is the only key allowed in client bundles. Never initialize a client with the service-role/service-account key in code that ships to the browser or in a client-callable edge/serverless function that lacks its own auth check.
+- The service-role key bypasses RLS entirely — any handler using it is a full bypass of every policy in section 4, so treat every service-role call site as needing its own independent authorization check.
+- Rotate the service-role key immediately if it was ever pasted into client code, committed, shared in a support ticket, or included in a prompt to an AI coding tool.
+- Watch for naming that blurs the two keys — an env var like NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY is already a leak by construction.
+
+CORS & headers
+- Never combine Access-Control-Allow-Origin: * with Allow-Credentials: true. Use an explicit origin allowlist.
+- Restrict allowed methods and headers to what the endpoint actually needs.
+
+Rate limiting & abuse control
+- Rate-limit per IP and per account on login, signup, password reset, OTP, contact forms, payments and any AI/LLM endpoint.
+- Add exponential backoff or lockout after repeated failures, and a spend cap on metered third-party calls.
+- Protect public write endpoints (waitlists, comments) with a bot check or proof-of-work.
+
+Race conditions & money
+- Use transactions, row locks or atomic updates for balances, inventory, credits, coupon redemption and idempotent webhooks.
+- Verify payment webhook signatures and process each event id exactly once. Never trust price or amount sent from the client — read it server-side.
+
+API surface & protocol gaps
+- Disable GraphQL introspection and the GraphiQL/Playground UI in production — it hands attackers the full schema.
+- Retire old API versions on a schedule; an unpatched v1 left live after v2 ships is a live attack surface. Apply the same auth, rate-limit and validation rules to every version, not just the current one.
+- Authenticate WebSocket connections at the handshake, not just on the first message; re-validate on reconnect.
+- Apply the same rate limiting and payload validation to socket events as to REST endpoints — chat, live dashboards and multiplayer state channels are common blind spots.
+
+Excessive data exposure & object property authorization
+- Never return a raw ORM object or full DB row from an endpoint. Define an explicit response shape (DTO/serializer) listing exactly which fields go out.
+- Audit list/detail endpoints for internal fields leaking by accident: password hashes, internal flags, margin data, other users' contact info nested in related objects.
+- Being authorized to view a field is not the same as it being safe to include by default.
+
+API key & token lifecycle
+- Issue scoped keys (least privilege, per-environment); store hashed, not plaintext; show the raw value only once at creation.
+- Support revocation that takes effect immediately without a redeploy; expire unused/stale keys on a schedule.
+- Log key usage so a leaked key shows up as an anomaly.
+
+Idempotency & retries
+- Require an idempotency key on POST endpoints that create orders/charges — a client retry after timeout must not double-charge or double-create.
+- Make webhook handlers idempotent by event ID even when the sender is expected to be well-behaved.
+
+Service-to-service & internal APIs
+- Internal network placement is not an authorization boundary. Authenticate service-to-service calls (mTLS or signed service tokens) even inside the same VPC.
+- Internal-only endpoints (admin, cron, batch jobs) get the same auth and validation as public ones.
+
+Dependencies, build & supply chain
+- Pin and audit dependencies; remove unused packages. Check for known CVEs before shipping.
+- Ensure debug endpoints, seed scripts, mock auth bypasses and admin backdoors are absent from production builds.
+- Watch for dependency confusion: internal package names must be reserved or scoped, or a public package of the same name can be installed instead.
+- Verify lockfile integrity in CI (npm ci / frozen lockfile) so a tampered or drifted lockfile fails the build instead of installing silently.
+- Run SAST and dependency/CVE scanning as a CI gate, not a one-time manual pass.
+
+4. DATABASE SECURITY & DATA INTEGRITY
+
+Least-privilege roles
+- The application's runtime DB user is not the superuser/owner role and cannot run DDL. Migrations run under a separate, more privileged role controlled by CI/CD.
+- Services/tenants sharing a database use different credentials where the platform supports it.
+
+Row Level Security, done completely
+- Policies exist for SELECT, INSERT, UPDATE and DELETE separately. A USING clause without a matching WITH CHECK on insert/update lets a user write into another tenant's data even if they can't read it back.
+- Every RLS policy is tested with a non-owner account, not just verified by reading the definition.
+
+Constraints as a second line of defense
+- Foreign keys, NOT NULL, CHECK and UNIQUE constraints are enforced at the DB level, not only in application code.
+- Money and quantity columns have CHECK constraints preventing negative balances/stock where negative values are never valid.
+
+Migrations
+- No destructive migration (DROP COLUMN, DROP TABLE, lossy type change) runs against production without a reviewed rollback plan and a fresh backup taken immediately before.
+- Migrations run through CI/CD with a distinct, audited credential — not manually against production from a developer's machine.
+- Long-running migrations on large tables are batched or use online-schema-change tooling.
+
+Backups & restore
+- Backups are automated, encrypted at rest, and stored in a separate account/region from production.
+- Restore is tested on a schedule and verified against a checklist — an untested backup is not a backup.
+- Backup retention matches the retention period stated in the privacy policy — backups are a place deleted data can keep existing.
+- Backup buckets/snapshots are confirmed not publicly readable and not reachable with the same credentials as the running application.
+
+Performance-as-security
+- Every column used in an RLS policy or a WHERE user_id = ... / tenant_id = ... filter is indexed.
+- N+1 query patterns and unbounded SELECT * on large tables are flagged as a resource-exhaustion vector.
+
+Replication, caches & sensitive columns
+- Data deleted or redacted on the primary is also removed from read replicas, caches and search indexes within a bounded, documented time.
+- The highest-sensitivity columns use field-level encryption or tokenization in addition to disk-level encryption.
+- Database connections use TLS; connection strings are never logged, committed, or included in error messages.
+
+Object storage & buckets
+- Storage buckets (Supabase Storage, S3, R2, Firebase Storage) default to public in many quick-start templates — confirm the deployed bucket policy explicitly rather than assuming it's private because the code intends it to be.
+- Apply the same per-object authorization as database rows: a signed, time-limited URL or a policy scoped to the owning user — never a globally-guessable static path.
+- Never accept a client-supplied storage key/path without validating it belongs to the requesting user's namespace — this is IDOR applied to files instead of rows.
+- Check that database backups, exports, or debug dumps were never written into a public-facing bucket "temporarily" and left there.
+- Treat bucket listing (ListObjects, .list()) as sensitive on its own: if a bucket allows public listing, an attacker enumerates every file even when individual files require a token.
+
+Audit trail
+- Security-relevant tables (roles, permissions, financial ledgers, admin actions) have an append-only audit log of who changed what and when.
+
+5. ERROR HANDLING & INFORMATION DISCLOSURE
+
+Production leaks
+- Never return raw database errors, stack traces, SQL, file paths or environment values to the client.
+- Log details server-side with a correlation id; return a generic message and a correct status code.
+- Keep timing and error text identical for "user not found" and "wrong password" to prevent account enumeration.
+
+Sensitive logging
+- Redact passwords, tokens, cookies, API keys, card data and PII from logs, error trackers and analytics.
+- Do not log full request bodies of auth or payment routes.
+
+6. GDPR & PRIVACY COMPLIANCE
+
+Data minimization & storage
+- Collect only what the feature needs right now; define a retention period and delete on schedule.
+- Never store unencrypted PII in localStorage, sessionStorage, URLs or client-side state that persists.
+- Encrypt PII at rest and in transit; restrict who and what service role can read it.
+
+Consent & third parties
+- Load analytics, tracking pixels, external fonts, maps and CDNs only after explicit opt-in consent — or self-host them.
+- No pre-ticked boxes, no cookie wall that hides a "reject all" option of equal prominence.
+- Truncate or hash IP addresses before storing them for rate limiting or analytics.
+- List every processor (hosting, email, payments, AI provider) in the privacy policy, including transfers outside the EU.
+
+Data subject rights
+- Implement real hard deletion across all tables, queues, caches, backups policy and third-party systems — not just a deleted_at flag.
+- Provide an authenticated export endpoint returning the user's data as JSON or CSV.
+- Log consent (what, when, version) and support withdrawal that is as easy as giving it.
+- Every marketing email needs a working one-click unsubscribe that suppresses future sends.
+
+Additional obligations
+- Detect and document breaches; regulators and, where required, affected users must be notified within 72 hours of becoming aware.
+- Support rectification — a user correcting inaccurate data about themselves — not only export and deletion.
+- If the product could plausibly be used by anyone under the local age of digital consent, gate signup with age verification and parental consent handling.
+- Have a signed Data Processing Agreement with every third-party processor named in the privacy policy — listing them is not sufficient on its own.
+
+7. AI & LLM INTEGRATION RISKS
+
+Prompt injection
+- Treat all user input, retrieved documents, web pages and tool output as untrusted data, never as instructions.
+- Separate system instructions from data with clear delimiters and re-state constraints after user content.
+- Assume the model can be talked into anything: enforce authorization in code, not in the prompt.
+
+Unsafe model output
+- HTML-encode or sanitize model output before rendering; never eval it or execute generated SQL/shell directly.
+- Validate structured output against a schema before it touches the database.
+
+Excessive agency
+- Give agents the narrowest possible tool scopes and read-only access by default.
+- Require human confirmation for deletions, payments, emails to real users and permission changes.
+- Never expose the model's provider key to the browser; proxy through your own rate-limited backend endpoint.
+
+Data leakage
+- Do not send secrets, other users' records or full PII into third-party model APIs. Redact before sending.
+- Disclose AI processing and the provider in the privacy policy.
+
+8. INFRASTRUCTURE & DEPLOYMENT
+
+Environments & exposure
+- Staging, preview and demo environments must not hold production data, and need the same auth as prod — "preview" is not a security boundary.
+- Admin panels and internal tools live behind a distinct auth layer and, where possible, an IP allowlist.
+
+TLS & transport
+- Enforce HTTPS everywhere with an HTTP->HTTPS redirect; enable HSTS (with preload once verified stable).
+- Confirm certificates on every custom domain are valid and auto-renewing, not self-signed or expired.
+
+Exposed surface
+- Confirm .env, .git, seed/config files and build artifacts are not served publicly; check robots.txt and sitemap.xml don't map internal-only routes.
+- Audit DNS: a dangling CNAME pointing at a deprovisioned Netlify/Heroku/S3 target is a takeover waiting to happen.
+
+9. MULTI-TENANCY & BUSINESS LOGIC
+
+Isolation beyond the database
+- Tenant isolation must hold in shared caches, queues, search indexes and background jobs, not only in Postgres RLS.
+
+Logic can be attacked, not just inputs
+- Check for workflow-skipping: calling a later-stage endpoint without the required prior step actually happening.
+- Check for abuse of coupons, referrals and credits: stacking, reuse, negative quantities, or claiming a referral bonus without a real referred action.
+
+Client-side gates are not gates
+- Any paywall or premium feature must be enforced server-side; a flag that only hides a button in the UI is not access control.
+
+10. MONITORING & INCIDENT RESPONSE
+
+Detection
+- Alert on anomalous auth activity: repeated failed logins, impossible-travel logins, sudden role/permission changes.
+- Monitor spend and usage on metered third-party APIs for anomalies that indicate a leaked key.
+
+Response
+- Keep a written runbook for what happens when a secret leaks: which keys rotate, who's notified, what gets revoked, in what order.
+- Restrict who can read logs and error-tracker data.
+
+11. FRAMEWORK-SPECIFIC TRAPS
+
+Next.js middleware & route auth
+- Middleware-based auth checks run at the edge and can be bypassed by requests hitting the underlying route handler directly if the handler doesn't also check auth itself — treat middleware as a first line, never the only line.
+- Extract the matcher config from every middleware file and diff it against the real route tree; a narrowly-scoped matcher silently leaves new routes unprotected as the app grows.
+
+Server Components, Server Actions & the client/server boundary
+- A Server Action is a public HTTP endpoint the moment it's exported — apply the same auth, input validation and rate limiting as any API route, not "it's only called from a trusted page."
+- Never pass a full object (user, order, record) from a Server Component into a Client Component as a prop without stripping server-only fields first — anything serialized to the client is visible in the page payload regardless of whether it's rendered.
+- Confirm modules marked server-only, or that import secrets or a DB client, are never imported — even transitively — by a file that ships to the client bundle. A shared "utils" file imported by both sides is a common leak vector.
+
+Static generation, ISR & personalized data
+- Never let a statically generated or revalidated (ISR) page embed one user's data — check every cached route for accidental cross-user data bleed, since a cache serves the same bytes to the next visitor.
+
+12. COST & RESOURCE GUARDRAILS
+
+Serverless & function spend
+- Set a concurrency limit or budget alert on serverless functions (Vercel, Netlify, Lambda, Supabase Edge Functions) — an unbounded function reachable from a public endpoint is a billing-DoS vector, not only an availability one.
+- Confirm recursive or self-triggering chains (a write that fires a webhook that triggers the same function again) can't loop unbounded.
+
+Database & storage spend
+- Cap query result size and row-scan limits on any endpoint driven by user input — an unindexed query with attacker-controlled filters is both a performance and a cost problem on usage-billed databases.
+- Set storage bucket size and egress alerts; an unauthenticated upload endpoint is a storage-cost vector as well as a security one.
+
+Third-party metered APIs
+- Confirm the spend cap on metered third-party calls required in section 3 actually exists in the provider dashboard, not only as a TODO — a missing cap on an AI, SMS, or email API is the most common source of an unexpected bill in a vibe-coded app.
+
+EXECUTION ORDER FOR THE AI (checklist for finding problems, not a license to rewrite unattended)
+1. Search: run the search patterns above (secrets, unsafe rendering, authorization gaps, storage) to build a candidate list of files and call sites before manual review.
+2. Scan the codebase against every mandate above, across backend functions, database policies, config, infrastructure and client code.
+3. Cite exact file/line, config key, or database policy for each finding, and state the concrete attack in one sentence.
+4. Rank findings by exploitability x blast radius.
+5. Report: return a bulleted findings report grouped by section, with severity, evidence and attack. Do not modify any code in this pass.
+6. Fix only if explicitly requested: address findings one at a time, re-verifying each against the same rule before moving on. Never satisfy a rule by disabling the check that caught it.
+7. Re-verify: re-check auth on touched endpoints, confirm RLS is on and complete for touched tables, confirm no secret is reachable from the client bundle, confirm tenant isolation holds outside the database, confirm no service-role key or bucket policy was reopened by the fix.
+
+This checklist is a technical aid, not legal advice. Compliance obligations depend on your jurisdiction, your data and your processors — have a lawyer review your privacy policy and data processing agreements.
+
+Base protocol: kiliansigel.com/fix-code. Sections 04 (Database), 08-10, and marked additions above are extensions for this reference.`;
+
+function copyPrompt(btn){
+  const ta = document.getElementById('copy-source');
+  ta.value = PLAIN_TEXT;
+  ta.select();
+  ta.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(PLAIN_TEXT).then(() => {
+    const original = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    document.execCommand('copy');
+    btn.textContent = 'Copied ✓';
+  });
+}
+</script>
+</body>
+</html>
