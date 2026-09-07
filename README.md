@@ -29,12 +29,12 @@ Both `AUDIT-PROTOCOL.md` and `audit-protocol.html` carry the same 12 sections pl
 
 ## What it covers
 
-Before the numbered sections, the protocol includes a **Search Patterns for the Agent** block — concrete `rg`/grep patterns for secrets, unsafe rendering, authorization gaps, and storage misconfiguration — so an autonomous agent has somewhere to start instead of relying entirely on its own judgment to find the relevant code.
+Before the numbered sections, the protocol includes a **Search Patterns for the Agent** block — concrete `rg`/grep patterns for secrets, unsafe rendering, authorization gaps, storage misconfiguration, and RLS ownership issues (e.g. `ENABLE ROW LEVEL SECURITY` without a matching `FORCE ROW LEVEL SECURITY`) — so an autonomous agent has somewhere to start instead of relying entirely on its own judgment to find the relevant code.
 
 1. Authentication, Authorization & Session Management — BOLA/IDOR, BFLA, JWT/cookie/session hygiene, OAuth/SSO pitfalls, account-recovery abuse
 2. Input Handling, Injection & Execution Traps — XSS, mass assignment, command injection/path traversal, SSRF, ReDoS, CSRF
 3. API Design, Secrets & Concurrency — secret exposure, backend-as-a-service key scoping (Supabase/Firebase service-role vs anon key), CORS, rate limiting, race conditions, API versioning/WebSockets, excessive data exposure, key lifecycle, idempotency, service-to-service auth, supply chain
-4. Database Security & Data Integrity — least-privilege roles, complete RLS, DB-level constraints, migration safety, backups/restore, indexing as a security concern, replication/cache consistency, object storage & bucket exposure, audit trails
+4. Database Security & Data Integrity — least-privilege roles (including explicit separation of the app's runtime role from the table *owner* role so RLS is never silently bypassed), complete RLS with `FORCE ROW LEVEL SECURITY` on every protected table, DB-level constraints, migration safety, backups/restore, indexing as a security concern, replication/cache consistency, object storage & bucket exposure, audit trails
 5. Error Handling & Information Disclosure
 6. GDPR & Privacy Compliance — data minimization, consent, data subject rights, breach notification
 7. AI & LLM Integration Risks — prompt injection, unsafe model output, excessive agency, data leakage to third-party model APIs
@@ -61,6 +61,7 @@ The base protocol (sections on Auth, Input Handling, Secrets/API/Concurrency, Er
 
 This fork extends it with:
 - A dedicated **Database Security & Data Integrity** section (new), including object storage & bucket exposure
+- **RLS ownership & enforcement** checks (added): cross-referencing `GRANT`/`OWNER TO` statements against the runtime connection role, requiring `FORCE ROW LEVEL SECURITY` on every RLS-protected table, and flagging app roles that are also table owners (a common silent RLS bypass)
 - Deeper **Authentication** coverage: OAuth/SSO pitfalls, session fixation, account-recovery/impersonation abuse, breached-password checks
 - Deeper **API** coverage: excessive data exposure, API key lifecycle, idempotency, service-to-service auth, backend-as-a-service key scoping (Supabase/Firebase service-role vs. anon key)
 - **Infrastructure & Deployment**, **Multi-Tenancy & Business Logic**, and **Monitoring & Incident Response** sections
