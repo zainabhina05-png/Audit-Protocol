@@ -390,6 +390,13 @@
           <li>List bucket contents directly (via provider CLI/dashboard) rather than trusting application code's intent — the deployed policy is the ground truth, not the code that (maybe) set it.</li>
         </ul>
       </div>
+      <div class="rule">
+        <div class="rule-head"><span class="rule-title">RLS ownership &amp; enforcement</span><span class="sec-added">added</span></div>
+        <ul class="checks">
+          <li>Cross-reference <code>GRANT</code>/<code>OWNER TO</code> statements in migrations against the runtime connection role (<code>DATABASE_URL</code>/<code>DB_USER</code> in env config) — if the app connects as the role that owns its own tables, RLS is a no-op on that role unless <code>FORCE ROW LEVEL SECURITY</code> is also set.</li>
+          <li><code>rg -n "ENABLE ROW LEVEL SECURITY"</code> and check each hit has a matching <code>FORCE ROW LEVEL SECURITY</code> on the same table — one without the other is a partial, easily-missed control. See <a href="#s4">§4</a>.</li>
+        </ul>
+      </div>
     </div>
 
     <!-- 1 -->
@@ -637,7 +644,7 @@
       <div class="rule">
         <div class="rule-head"><span class="rule-title">Least-privilege roles</span><span class="tag critical">Critical</span></div>
         <ul class="checks">
-          <li>The application's runtime DB user is not the superuser/owner role and cannot run DDL. Migrations run under a separate, more privileged role controlled by CI/CD.</li>
+          <li>The application's runtime DB user is not the superuser/owner role and cannot run DDL. Migrations run under a separate, more privileged role controlled by CI/CD. <span class="sec-added">added</span> Explicitly: the role the app connects as should not be the <em>owner</em> of the tables it queries either — so that RLS (including <code>FORCE ROW LEVEL SECURITY</code>, below) actually applies to app traffic.</li>
           <li>Services/tenants sharing a database use different credentials where the platform supports it, so one compromised account doesn't expose everything.</li>
         </ul>
       </div>
@@ -647,6 +654,7 @@
         <ul class="checks">
           <li>Policies exist for <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code> and <code>DELETE</code> separately. A <code>USING</code> clause without a matching <code>WITH CHECK</code> on insert/update lets a user write into another tenant's data even if they can't read it back.</li>
           <li>Every RLS policy is tested with a non-owner account, not just verified by reading the definition — edge cases like NULL tenant IDs or service-role bypasses can slip past a policy that looks correct.</li>
+          <li><span class="sec-added">added</span> Table owners bypass RLS by default in PostgreSQL — including an application role that owns the tables it queries, a common setup when the same role runs migrations and serves the app. Run <code>ALTER TABLE ... FORCE ROW LEVEL SECURITY</code> on every RLS-protected table, and confirm the role the app actually connects as in production (not a separately created test role) is neither the table owner nor has <code>BYPASSRLS</code> — a superuser or <code>BYPASSRLS</code> role bypasses RLS regardless of <code>FORCE</code>.</li>
         </ul>
       </div>
 
