@@ -41,6 +41,10 @@ A checklist tells a human what to look for. An autonomous agent also needs *wher
 - `rg -n "storage\.from\(|createBucket|PutObjectCommand|\.upload\("` — for each, check the bucket's access policy and whether the stored path is scoped to the uploading user.
 - List bucket contents directly via the provider CLI/dashboard rather than trusting application code's intent — the deployed policy is the ground truth, not the code that (maybe) set it.
 
+**RLS ownership & enforcement** *(added)*
+- Cross-reference `GRANT`/`OWNER TO` statements in migrations against the runtime connection role (`DATABASE_URL`/`DB_USER` in env config) — if the app connects as the role that owns its own tables, RLS is a no-op on that role unless `FORCE ROW LEVEL SECURITY` is also set.
+- `rg -n "ENABLE ROW LEVEL SECURITY"` and check each hit has a matching `FORCE ROW LEVEL SECURITY` on the same table — one without the other is a partial, easily-missed control. See [§4](#04-database-security--data-integrity).
+
 ---
 
 ## Table of Contents
@@ -206,12 +210,13 @@ Severity tags: **Critical** · **High** · **Compliance**. Items marked *(added)
 ## 04. Database Security & Data Integrity *(new section)*
 
 ### Least-Privilege Roles — Critical
-- The application's runtime database user is not the superuser/owner role, and cannot run DDL. Use a separate, more privileged role for migrations only, run under CI/CD control — not by the running app.
+- The application's runtime database user is not the superuser/owner role, and cannot run DDL. Use a separate, more privileged role for migrations only, run under CI/CD control — not by the running app. ***(added)*** Explicitly: the role the app connects as should not be the *owner* of the tables it queries either — migrations should run under a separate, more privileged role, so that RLS (including `FORCE ROW LEVEL SECURITY`, see below) actually applies to app traffic.
 - Different services/tenants that share a database use different credentials where the platform supports it, so one compromised service account doesn't expose everything.
 
 ### Row Level Security, Done Completely — Critical
 - RLS policies exist for `SELECT`, `INSERT`, `UPDATE`, and `DELETE` separately. A `USING` clause without a matching `WITH CHECK` on `INSERT`/`UPDATE` lets an authenticated user *write* rows into another tenant's data even though they can't read them back directly.
 - Every RLS policy is tested with a non-owner account, not just verified by reading the policy definition — policies that look correct can still fail against edge cases like `NULL` tenant IDs or service-role bypasses.
+- ***(added)*** Table owners bypass RLS by default in PostgreSQL — including an application role that owns the tables it queries, a common setup when the same role runs migrations and serves the app. Run `ALTER TABLE ... FORCE ROW LEVEL SECURITY` on every RLS-protected table, and confirm the role the app actually connects as in production (not a separately created test role) is neither the table owner nor has `BYPASSRLS` — a superuser or `BYPASSRLS` role bypasses RLS regardless of `FORCE`.
 
 ### Constraints as a Second Line of Defense — High
 - Foreign keys, `NOT NULL`, `CHECK`, and `UNIQUE` constraints are enforced at the database level, not only in application code — an application bug should not be able to write orphaned, negative, or otherwise impossible rows.
