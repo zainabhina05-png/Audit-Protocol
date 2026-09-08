@@ -2,7 +2,7 @@
 
 A checklist you paste into an AI coding agent (Claude, Cursor, Copilot, Codex, Lovable, etc.) so it audits your app's authentication, database, API, and privacy posture against a consistent, opinionated set of rules — instead of whatever the model happens to remember about security that day.
 
-**This is a check protocol, not a fix protocol.** It's designed to make an agent *find and report* violations with evidence and severity. Turning findings into code changes is a deliberate, separate step — see [Execution Order](AUDIT-PROTOCOL.md#execution-order-for-the-ai) in the protocol itself.
+**This is a check protocol, not a fix protocol.** It's designed to make an agent *find and report* violations with evidence and severity. Turning findings into code changes is a deliberate, separate step  see [Execution Order](AUDIT-PROTOCOL.md#execution-order-for-the-ai) in the protocol itself.
 
 ## Why this exists
 
